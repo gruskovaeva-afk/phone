@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhoneZone — магазин телефонів</title>
+<style>
+:root{--red:#f3263e;--bg:#101010;--panel:#191919;--panel2:#222;--white:#f7f7f7;--muted:#aaa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--white);font-family:Arial,Helvetica,sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer;border:0;border-radius:8px;padding:11px 15px;background:var(--red);color:#fff;font-weight:700;transition:.2s}
+button:hover{filter:brightness(1.15);transform:translateY(-1px)}
+header{background:#050505;padding:16px 4%;display:flex;align-items:center;gap:18px;position:sticky;top:0;z-index:10;border-bottom:1px solid #292929}
+.logo{font-size:25px;font-weight:900;white-space:nowrap}.logo span{color:var(--red)}
+.search{display:flex;flex:1;max-width:600px}.search input{width:100%;padding:12px;border:0;border-radius:8px 0 0 8px;background:#f5f5f5;color:#111;min-width:50px}.search button{border-radius:0 8px 8px 0}
+.header-actions{display:flex;align-items:center;gap:10px;margin-left:auto}.icon-btn{background:#242424;border:1px solid #333;white-space:nowrap}.balance{font-size:13px;color:#ddd;white-space:nowrap}
+.layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:24px;max-width:1400px;margin:24px auto;padding:0 24px}
+aside{background:#171717;border:1px solid #292929;border-radius:14px;padding:18px;height:max-content;position:sticky;top:90px}
+h3{margin:0 0 16px}.red{color:var(--red)}
+.category{display:block;width:100%;text-align:left;margin:7px 0;background:#242424;color:#eee}.category.active,.category:hover{background:var(--red)}
+.ad{margin-top:22px;padding:18px 14px;border-radius:12px;background:linear-gradient(140deg,#fa1836,#68101c);line-height:1.5}.ad strong{font-size:23px}
+main{min-width:0}
+.hero{min-height:250px;padding:34px;border-radius:16px;background:radial-gradient(circle at 80% 50%,#6b101b 0,#241014 34%,#090909 75%);display:flex;align-items:center;justify-content:space-between;overflow:hidden;border:1px solid #36171c}
+.hero h1{font-size:clamp(30px,4vw,54px);line-height:1;margin:0 0 14px}.hero p{color:#ddd;max-width:430px;line-height:1.5}.hero-art{font-size:120px;filter:drop-shadow(0 15px 22px #000);transform:rotate(-12deg);padding:0 35px}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin:30px 0 16px}.section-head h2{margin:0;font-size:25px}.section-head small{color:var(--muted)}
+.products{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
+.card{background:var(--panel);border:1px solid #2c2c2c;border-radius:13px;padding:15px;position:relative;transition:.2s;min-width:0}
+.card:hover{border-color:var(--red);transform:translateY(-3px);box-shadow:0 8px 25px #0007}
+.phone-pic{height:145px;display:flex;align-items:center;justify-content:center;font-size:78px;background:radial-gradient(ellipse,#333,#191919 65%);border-radius:9px;margin-bottom:13px}
+.tag{position:absolute;top:24px;left:24px;background:var(--red);font-size:11px;font-weight:bold;padding:5px 7px;border-radius:5px}
+.card h3{font-size:16px;min-height:38px;margin:0 0 9px}.price{font-size:19px;font-weight:800;color:var(--red);margin:8px 0 13px}.old{color:#888;text-decoration:line-through;font-size:13px;margin-left:6px;font-weight:400}.buy-row{display:flex;gap:8px}.buy-row button{flex:1}.heart{background:#303030;padding:9px 11px}
+.new-products{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.new-products .card{padding:12px}.new-products .phone-pic{height:110px;font-size:60px}.new-products .card h3{font-size:14px;min-height:34px}
+footer{text-align:center;color:#888;padding:30px 15px;margin-top:25px;border-top:1px solid #292929}
+.cart-overlay{position:fixed;inset:0;background:#000a;z-index:30;display:none;justify-content:flex-end}.cart-overlay.open{display:flex}
+.cart-panel{width:min(520px,100%);height:100%;overflow-y:auto;background:#111;border-left:1px solid #3a3a3a;padding:24px;box-shadow:-15px 0 50px #0008}
+.cart-top{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #333;padding-bottom:16px}.cart-top h2{margin:0}.close{background:#292929;font-size:20px;padding:6px 12px}
+.cart-empty{text-align:center;padding:55px 10px;color:#aaa}.cart-empty .bag{font-size:60px;margin-bottom:12px}
+.cart-item{display:grid;grid-template-columns:70px 1fr auto;gap:13px;align-items:center;padding:16px 0;border-bottom:1px solid #2d2d2d}
+.cart-item .mini-pic{height:70px;border-radius:9px;background:#242424;display:grid;place-items:center;font-size:39px}
+.cart-item h4{margin:0 0 7px;font-size:14px}.item-price{font-weight:bold;color:var(--red);font-size:14px}
+.qty{display:flex;align-items:center;gap:9px;margin-top:9px}.qty button{padding:3px 9px;background:#333}.remove{display:block;background:transparent;color:#ff5365;padding:5px 0;font-size:12px}
+.cart-summary{border-top:1px solid #383838;margin-top:20px;padding-top:18px}.summary-line{display:flex;justify-content:space-between;margin:10px 0;color:#ccc}.total{font-size:22px;font-weight:800;color:#fff}.checkout{width:100%;padding:14px;margin-top:12px}.continue{width:100%;margin-top:9px;background:#292929}
+.checkout-form{display:none;margin-top:20px;padding:16px;background:#1b1b1b;border-radius:10px}.checkout-form.show{display:block}.checkout-form label{display:block;font-size:13px;color:#ccc;margin:12px 0 6px}.checkout-form input,.checkout-form select{width:100%;padding:11px;border-radius:7px;border:1px solid #444;background:#101010;color:#fff}.notice{font-size:12px;color:#999;line-height:1.5}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#252525;border:1px solid #444;padding:12px 18px;border-radius:9px;z-index:50;display:none}.toast.show{display:block}
+@media(max-width:950px){header{flex-wrap:wrap}.search{order:3;max-width:none;flex-basis:100%}.layout{grid-template-columns:180px minmax(0,1fr);padding:0 14px;gap:14px}.products{grid-template-columns:repeat(2,minmax(0,1fr))}.new-products{grid-template-columns:repeat(2,minmax(0,1fr))}.hero-art{font-size:90px;padding:0 8px}}
+@media(max-width:620px){header{padding:12px}.logo{font-size:22px}.header-actions{gap:6px}.balance{display:none}.icon-btn{padding:9px}.layout{display:block;margin:14px auto;padding:0 12px}aside{position:static;margin-bottom:14px;padding:12px}.category-wrap{display:flex;gap:6px;flex-wrap:wrap}.category{width:auto;margin:0;padding:9px 10px;font-size:13px}.ad{margin-top:12px;padding:12px}.ad strong{font-size:18px}.hero{padding:23px 18px;min-height:210px}.hero-art{font-size:67px;padding:0}.hero p{font-size:14px}.products{gap:10px}.card{padding:10px}.phone-pic{height:115px;font-size:60px}.card h3{font-size:14px}.price{font-size:16px}.buy-row button{padding:9px 7px;font-size:12px}.heart{padding:7px}.new-products{gap:10px}.section-head h2{font-size:22px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">▣ Phone<span>Zone</span></div>
+  <form class="search" id="searchForm"><input id="searchInput" type="search" placeholder="Пошук товарів..." aria-label="Пошук товарів"><button type="submit">⌕</button></form>
+  <div class="header-actions">
+    <button class="icon-btn" id="langBtn" title="Змінити мову">UA ▾</button>
+    <button class="icon-btn" id="cartOpen" aria-label="Відкрити кошик">🛒 <span id="cartCount">0</span></button>
+    <button class="icon-btn" id="profileBtn" title="Профіль">♙</button>
+    <span class="balance">Баланс: <b>0 ₴</b></span>
+  </div>
+</header>
+<div class="layout">
+  <aside>
+    <h3 class="red">КАТЕГОРІЇ</h3>
+    <div class="category-wrap">
+      <button class="category active" data-category="Усі">▣ Усі товари</button>
+      <button class="category" data-category="Смартфони">▣ Смартфони</button>
+      <button class="category" data-category="Планшети">▣ Планшети</button>
+      <button class="category" data-category="Аксесуари">♧ Аксесуари</button>
+    </div>
+    <div class="ad"><strong>ЗНИЖКИ ДО -50%</strong><br>Обирай найкраще за вигідною ціною!<br><button style="margin-top:12px;background:#111" onclick="document.getElementById('sales').scrollIntoView({behavior:'smooth'})">Детальніше</button></div>
+  </aside>
+  <main>
+    <section class="hero">
+      <div><h1>PHONEZONE <span class="red">SALE</span></h1><p>Найкращі смартфони за найкращими цінами. Обирай свій наступний пристрій!</p><button onclick="document.getElementById('sales').scrollIntoView({behavior:'smooth'})">Купити зараз →</button></div>
+      <div class="hero-art" aria-hidden="true">📱</div>
+    </section>
+    <section id="sales">
+      <div class="section-head"><h2>🔥 Sales</h2><small>Вигідні пропозиції</small></div>
+      <div class="products" id="salesProducts"></div>
+    </section>
+    <section id="new">
+      <div class="section-head"><h2>New products <span class="red">●</span></h2><small>Свіжі надходження</small></div>
+      <div class="new-products" id="newProducts"></div>
+    </section>
+  </main>
+</div>
+<footer>© 2026 PhoneZone · Магазин техніки</footer>
+
+<div class="cart-overlay" id="cartOverlay" aria-hidden="true">
+  <section class="cart-panel" role="dialog" aria-modal="true" aria-labelledby="cartTitle">
+    <div class="cart-top"><h2 id="cartTitle">🛒 Моя корзина</h2><button class="close" id="cartClose" aria-label="Закрити кошик">×</button></div>
+    <div id="cartContent"></div>
+    <div class="checkout-form" id="checkoutForm">
+      <h3>Оформлення замовлення</h3>
+      <form id="orderForm">
+        <label for="customerName">Ваше ім'я</label><input id="customerName" required placeholder="Як до вас звертатися?">
+        <label for="customerPhone">Номер телефону</label><input id="customerPhone" required type="tel" placeholder="+380..." pattern="[+0-9() \-]{9,}" >
+        <label for="delivery">Доставка</label><select id="delivery"><option>Нова пошта</option><option>Укрпошта</option><option>Самовивіз</option></select>
+        <label for="customerAddress">Місто та відділення / адреса</label><input id="customerAddress" required placeholder="Місто, відділення або адреса">
+        <button class="checkout" type="submit">Підтвердити замовлення</button>
+      </form>
+      <p class="notice">Демо-магазин: форма показує підтвердження на сторінці, але не надсилає реальне замовлення.</p>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script>
+const products = [
+ {id:1,name:'iPhone 16 Pro',price:44999,old:52999,icon:'📱',tag:'-15%',category:'Смартфони'},
+ {id:2,name:'Samsung Galaxy S25',price:34999,old:39999,icon:'📱',tag:'-12%',category:'Смартфони'},
+ {id:3,name:'Xiaomi 15',price:29999,old:34999,icon:'📱',tag:'-14%',category:'Смартфони'},
+ {id:4,name:'iPhone 15',price:29499,old:32999,icon:'📱',tag:'-10%',category:'Смартфони'},
+ {id:5,name:'Samsung Galaxy A56',price:18999,old:21999,icon:'📱',tag:'-13%',category:'Смартфони'},
+ {id:6,name:'Redmi Note 14 Pro',price:13999,old:15999,icon:'📱',tag:'-12%',category:'Смартфони'},
+ {id:7,name:'iPhone 17 Pro',price:56999,old:59999,icon:'📱',tag:'NEW',category:'Смартфони',isNew:true,desc:'Потужність нового покоління'},
+ {id:8,name:'Galaxy S25 Ultra',price:49999,old:54999,icon:'📱',tag:'NEW',category:'Смартфони',isNew:true,desc:'Преміальна камера та дисплей'},
+ {id:9,name:'Google Pixel 10',price:36999,old:39999,icon:'📱',tag:'NEW',category:'Смартфони',isNew:true,desc:'Розумна камера Google'},
+ {id:10,name:'Xiaomi 15 Ultra',price:44999,old:49999,icon:'📱',tag:'SALE',category:'Смартфони',isNew:true,desc:'Флагманська фотозйомка'},
+ {id:11,name:'PhoneZone Tab 11',price:11999,old:13999,icon:'▭',tag:'-14%',category:'Планшети'},
+ {id:12,name:'Захисний чохол',price:499,old:699,icon:'▰',tag:'-28%',category:'Аксесуари'}
+];
+let cart = {};
+let activeCategory = 'Усі';
+let query = '';
+const money = n => new Intl.NumberFormat('uk-UA').format(n) + ' ₴';
+function getProduct(id){return products.find(p=>p.id===Number(id))}
+function productCard(p, compact=false){
+ return `<article class="card"><span class="tag">${p.tag}</span><div class="phone-pic" aria-hidden="true">${p.icon}</div><h3>${p.name}</h3>${p.desc?`<div style="color:#aaa;font-size:12px;min-height:30px">${p.desc}</div>`:''}<div class="price">${money(p.price)} <span class="old">${money(p.old)}</span></div><div class="buy-row"><button onclick="addToCart(${p.id})">Купити</button><button class="heart" aria-label="Додати в обране" onclick="toggleHeart(this)">♡</button></div></article>`
+}
+function renderProducts(){
+ const matches=products.filter(p=>(activeCategory==='Усі'||p.category===activeCategory)&&(!query||(p.name+' '+p.category).toLowerCase().includes(query.toLowerCase())));
+ document.getElementById('salesProducts').innerHTML=matches.filter(p=>!p.isNew).map(p=>productCard(p)).join('')||'<p style="color:#aaa">Товарів не знайдено.</p>';
+ document.getElementById('newProducts').innerHTML=matches.filter(p=>p.isNew).map(p=>productCard(p,true)).join('')||'<p style="color:#aaa">Немає товарів у цій секції.</p>';
+}
+function addToCart(id){cart[id]=(cart[id]||0)+1;renderCart();showToast('Товар додано до корзини');}
+function changeQty(id,delta){cart[id]=(cart[id]||0)+delta;if(cart[id]<=0)delete cart[id];renderCart()}
+function removeItem(id){delete cart[id];renderCart();showToast('Товар видалено')}
+function renderCart(){
+ const entries=Object.entries(cart).filter(([id,q])=>q>0);
+ const count=entries.reduce((sum,[id,q])=>sum+q,0);
+ document.getElementById('cartCount').textContent=count;
+ const host=document.getElementById('cartContent');
+ if(!entries.length){
+  host.innerHTML='<div class="cart-empty"><div class="bag">🛒</div><h3>Корзина порожня</h3><p>Додай товари, які тобі сподобалися.</p><button onclick="closeCart()">Перейти до покупок</button></div>';
+  document.getElementById('checkoutForm').classList.remove('show');
+  return;
+ }
+ const total=entries.reduce((sum,[id,q])=>sum+getProduct(id).price*q,0);
+ host.innerHTML=entries.map(([id,q])=>{const p=getProduct(id);return `<div class="cart-item"><div class="mini-pic">${p.icon}</div><div><h4>${p.name}</h4><div class="item-price">${money(p.price)}</div><div class="qty"><button aria-label="Зменшити кількість" onclick="changeQty(${id},-1)">−</button><span>${q}</span><button aria-label="Збільшити кількість" onclick="changeQty(${id},1)">+</button></div><button class="remove" onclick="removeItem(${id})">Видалити</button></div><b>${money(p.price*q)}</b></div>`}).join('')+
+ `<div class="cart-summary"><div class="summary-line"><span>Товарів</span><span>${count}</span></div><div class="summary-line total"><span>Разом</span><span>${money(total)}</span></div><button class="checkout" id="checkoutBtn" onclick="document.getElementById('checkoutForm').classList.add('show');document.getElementById('checkoutForm').scrollIntoView({behavior:'smooth',block:'nearest'})">Оформити замовлення</button><button class="continue" onclick="closeCart()">Продовжити покупки</button></div>`;
+}
+function openCart(){document.getElementById('cartOverlay').classList.add('open');document.getElementById('cartOverlay').setAttribute('aria-hidden','false');renderCart()}
+function closeCart(){document.getElementById('cartOverlay').classList.remove('open');document.getElementById('cartOverlay').setAttribute('aria-hidden','true')}
+function showToast(text){const t=document.getElementById('toast');t.textContent=text;t.classList.add('show');clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.classList.remove('show'),2200)}
+function toggleHeart(btn){btn.textContent=btn.textContent==='♡'?'♥':'♡';btn.style.color=btn.textContent==='♥'?'#f3263e':'#fff'}
+document.getElementById('cartOpen').addEventListener('click',openCart);
+document.getElementById('cartClose').addEventListener('click',closeCart);
+document.getElementById('cartOverlay').addEventListener('click',e=>{if(e.target.id==='cartOverlay')closeCart()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCart()});
+document.getElementById('searchForm').addEventListener('submit',e=>{e.preventDefault();query=document.getElementById('searchInput').value.trim();renderProducts();document.getElementById('sales').scrollIntoView({behavior:'smooth'})});
+document.querySelectorAll('[data-category]').forEach(btn=>btn.addEventListener('click',()=>{activeCategory=btn.dataset.category;document.querySelectorAll('[data-category]').forEach(b=>b.classList.toggle('active',b===btn));renderProducts()}));
+document.getElementById('langBtn').addEventListener('click',()=>showToast('Демо: доступна українська мова'));
+document.getElementById('profileBtn').addEventListener('click',()=>showToast('Профіль користувача — демоверсія'));
+document.getElementById('orderForm').addEventListener('submit',e=>{e.preventDefault();if(!Object.keys(cart).length)return;const name=document.getElementById('customerName').value.trim();const total=Object.entries(cart).reduce((s,[id,q])=>s+getProduct(id).price*q,0);document.getElementById('cartContent').innerHTML=`<div class="cart-empty"><div class="bag">✓</div><h3>Дякуємо, ${name}!</h3><p>Замовлення на суму <b class="red">${money(total)}</b> оформлено в демоверсії.</p><p>Реальне замовлення не було надіслано.</p><button onclick="cart={};renderCart();closeCart()">Повернутися до магазину</button></div>`;document.getElementById('checkoutForm').classList.remove('show');cart={};document.getElementById('cartCount').textContent='0'});
+renderProducts();renderCart();
+</script>
+</body>
+</html>
